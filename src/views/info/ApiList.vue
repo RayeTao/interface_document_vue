@@ -1,7 +1,7 @@
 <template>
     <div style="margin-top: 100px">
       <el-table
-        :data="tableData4"
+        :data="apiList"
         height="550"
         border>
         <el-table-column
@@ -9,31 +9,36 @@
           width="55">
         </el-table-column>
         <el-table-column
-          prop="date"
+          prop="apiUrl"
+          label="接口url"
+          width="180">
+        </el-table-column>
+        <el-table-column
+          prop="apiName"
           label="接口名称"
           width="180">
         </el-table-column>
         <el-table-column
-          prop="name"
+          prop="methodType"
           label="请求方式"
           width="120">
         </el-table-column>
         <el-table-column
-          prop="address"
-          label="请求参数"
-          width="240">
+          prop="creatorName"
+          label="创建者"
+          width="120">
         </el-table-column>
         <el-table-column
-          prop="address2"
-          label="返回参数"
-          width="240">
+          prop="createTime"
+          label="创建时间"
+          width="180">
         </el-table-column>
         <el-table-column
           fixed="right"
           label="操作"
           width="160">
           <template slot-scope="scope">
-            <el-button @click="handleClick(scope.row)" type="text" size="small">查看</el-button>
+            <el-button type="text" size="small" @click="goDetail(scope.row)">查看</el-button>
             <el-button type="text" size="small">编辑</el-button>
             <el-button type="text" size="small">删除</el-button>
           </template>
@@ -50,62 +55,55 @@
 </template>
 
 <script>
+  import axios from 'axios'
     export default {
         data(){
           return{
-            tableData4: [{
-              date: '2016-05-03',
-              name: 'GET',
-              address: '上海市普陀区金沙江路 1518 弄',
-              address2: '上海市普陀区金沙江路 1518 弄dfdsdsdsdsd'
-            }, {
-              date: '2016-05-02',
-              name: 'GET',
-              address: '上海市普陀区金沙江路 1518 弄',
-              address2: '上海市普陀区金沙江路 1518 弄dfdsdsdsdsd'
-            }, {
-              date: '2016-05-04',
-              name: 'GET',
-              address: '上海市普陀区金沙江路 1518 弄',
-              address2: '上海市普陀区金沙江路 1518 弄dfdsdsdsdsd'
-            }, {
-              date: '2016-05-01',
-              name: 'GET',
-              address: '上海市普陀区金沙江路 1518 弄',
-              address2: '上海市普陀区金沙江路 1518 弄dfdsdsdsdsd'
-            }, {
-              date: '2016-05-08',
-              name: 'GET/POST',
-              address: '上海市普陀区金沙江路 1518 弄',
-              address2: '上海市普陀区金沙江路 1518 弄dfdsdsdsdsd'
-            }, {
-              date: '2016-05-06',
-              name: 'GET',
-              address: '上海市普陀区金沙江路 1518 弄',
-              address2: '上海市普陀区金沙江路 1518 弄dfdsdsdsdsd'
-            }, {
-              date: '2016-05-07',
-              name: 'GET',
-              address: '上海市普陀区金沙江路 1518 弄',
-              address2: '上海市普陀区金沙江路 1518 弄dfdsdsdsdsd'
-            }, {
-              date: '2016-05-07',
-              name: 'GET',
-              address: '上海市普陀区金沙江路 1518 弄',
-              address2: '上海市普陀区金沙江路 1518 弄dfdsdsdsdsd'
-            }, {
-              date: '2016-05-07',
-              name: 'GET',
-              address: '上海市普陀区金沙江路 1518 弄',
-              address2: '上海市普陀区金沙江路 1518 弄dfdsdsdsdsd'
-            }, {
-              date: '2016-05-07',
-              name: 'GET',
-              address: '上海市普陀区金沙江路 1518 弄',
-              address2: '上海市普陀区金沙江路 1518 弄dfdsdsdsdsd'
-            }]
+            apiList: [],
+            menuId: 0
           }
+        },
+      methods:{
+        init(){
+          let params = this.$route.params
+          this.menuId = params && params.menuId
+          this.getDataList()
+        },
+        getDataList(){
+          let vm = this;
+          axios.get("/getApiList",{
+            params: {
+              menuId: this.menuId
+            }
+          }).then(function (data) {
+            if(data && data.data.success){
+              vm.apiList = data.data.data
+            }else{
+
+            }
+          }).catch(function (error) {
+
+          })
+        },
+        goDetail(row){
+          console.log(row)
+          this.$router.push({
+            name: 'apiInfoDetail',
+            params: {
+              apiInfo: row
+            }
+          })
         }
+      },
+      mounted(){
+          this.init();
+          let vm = this;
+        this.bus.$on("menuItem",function (item) {
+          vm.menuId = item.menuId
+          vm.apiList.splice(0,vm.apiList.length)
+          vm.getDataList()
+        })
+      }
     }
 </script>
 

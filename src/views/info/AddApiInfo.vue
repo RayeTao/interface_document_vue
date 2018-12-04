@@ -7,7 +7,7 @@
     <div style="margin-top: 20px;">
       <el-form :model="apiInfoForm" ref="apiInfoForm" label-width="100px">
         <el-form-item prop="email" label="IP地址" class="form-item" v-show="addType == 2">
-          <el-input v-model="apiInfoForm.ipAddress"></el-input>
+          <el-input v-model="ipAddress"></el-input>
         </el-form-item>
         <el-form-item prop="email" label="接口地址" class="form-item">
           <el-input v-model="apiInfoForm.apiAddress"></el-input>
@@ -15,6 +15,7 @@
         <el-form-item prop="email" label="接口名称" class="form-item">
           <el-input v-model="apiInfoForm.apiName"></el-input>
         </el-form-item>
+
         <el-form-item label="请求方式">
           <el-select v-model="apiInfoForm.methodType" style="float: left">
             <el-option label="默认" value="ALL"></el-option>
@@ -25,10 +26,14 @@
             <el-option label="DELETE" value="DELETE"></el-option>
           </el-select>
         </el-form-item>
+
         <el-form-item  label="请求参数:" style="float: left">
+          <el-button type="primary" @click="apiInfoForm.requestParamsType =1">Headers</el-button>
+          <el-button type="primary" @click="apiInfoForm.requestParamsType =2">Body</el-button>
           <el-button type="primary" @click="addRequestParams" >新增参数</el-button>
         </el-form-item>
         <el-form :inline="true" style="float: left;margin-left: 20px"
+                 v-show="apiInfoForm.requestParamsType ==1"
                  v-for="(requestParams, index) in apiInfoForm.requestParamsForm"  :key="index">
           <el-form-item :label="'参数' + (index+1)" >
             <el-input v-model="requestParams.requestParamsKey" placeholder="参数名称" style="width: 150px"></el-input>
@@ -60,7 +65,11 @@
             <el-button type="primary" @click="deleteRequestParams(requestParams)">删除</el-button>
           </el-form-item>
         </el-form>
-        <el-form-item  label="返回参数:" style="float: left">
+        <el-form-item  v-show="apiInfoForm.requestParamsType ==2" style="clear: both;width: 600px;float: left">
+          <el-input v-model="apiInfoForm.requestParamsBody" placeholder="" type="textarea" :rows="10"></el-input>
+        </el-form-item>
+
+        <el-form-item  label="返回参数:" style="clear: both;float: left">
           <el-button type="primary" @click="apiInfoForm.responseParamsType =1" v-show="addType == 1">Headers</el-button>
           <el-button type="primary" @click="apiInfoForm.responseParamsType =2" v-show="addType == 1">Body</el-button>
           <el-button type="primary" @click="addResponseParams" v-show="addType == 1">新增参数</el-button>
@@ -112,12 +121,16 @@
 </template>
 
 <script>
-    export default {
+  import axios from 'axios'
+  import {getObjectByKey} from "../../config/help";
+
+  export default {
       data(){
         return{
+          menuId: '',
+          userName: '',
           addType: '1',
           apiInfoForm: {
-            ipAddress: '',
             apiAddress: '',
             apiName: '',
             methodType: '',
@@ -135,12 +148,20 @@
               responseParamsRequired: '',
               responseParamsDesc: '',
             }],
+            requestParamsType: 1,
+            requestParamsBody: '',
             responseParamsType: 1,
             responseParamsBody: '',
           },
+          ipAddress: '',
         }
       },
       methods:{
+        init(){
+          let params = this.$route.params;
+          this.menuId = params && params.menuId;
+          this.userName = getObjectByKey("userInfo").userName
+        },
         addRequestParams(){
           this.apiInfoForm.requestParamsForm.push({
             requestParamsKey: '',
@@ -175,25 +196,31 @@
 
         },
         submit() {
-          /*this.$refs[formName].validate((valid) => {
-            if (valid) {
-              alert('submit!');
-            } else {
-              console.log('error submit!!');
-              return false;
-            }
-          });*/
+         let vm = this;
+       /*  var params = new URLSearchParams();
+         params.append("apiInfoForm",this.apiInfoForm+"");*/
+         axios.post('/saveApiInfo',{
+           data:{
+             "apiInfoForm": this.apiInfoForm,
+             "menuId": this.menuId,
+             "userName": this.userName
+           }
+         })
+           .then(function (res) {
+             if(res && res.success){
+
+             }
+           }).catch(function (error) {
+
+         })
         },
         reset(formName) {
           this.$refs[formName].resetFields();
         },
-        removeDomain(item) {
-        /*  var index = this.apiInfoForm.domains.indexOf(item)
-          if (index !== -1) {
-            this.apiInfoForm.domains.splice(index, 1)
-          }*/
-        },
-      }
+      },
+    mounted(){
+        this.init()
+    }
     }
 </script>
 

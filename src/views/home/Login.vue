@@ -29,9 +29,6 @@
         password: ''
       }
     },
-    created(){
-      removeObject('userInfo')
-    },
     methods:{
       login: function(){
         if(!this.username){
@@ -58,6 +55,7 @@
           }
         }).then(function (response) {
           if(response.data.success) {
+            saveObject("userInfo",response.data.data)
             vm.$message({
               message:response.data.message,
               type:'success'

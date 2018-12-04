@@ -7,6 +7,8 @@ const Login = () => import('../views/home/Login.vue').then(m => m.default);
 const Home = () => import('../views/home/Home.vue').then(m => m.default);
 const ApiList = () => import('../views/info/ApiList.vue').then(m => m.default);
 const AddApiInfo = () => import('../views/info/AddApiInfo.vue').then(m => m.default);
+const ApiInfoDetail = () => import('../views/info/ApiInfoDetail.vue').then(m => m.default);
+
 
 export default new Router({
   routes: [
@@ -24,6 +26,11 @@ export default new Router({
           path: '/home/apiList',
           name: 'apiList',
           component: ApiList
+        },
+        {
+          path: '/home/apiList/apiInfoDetail',
+          name: 'apiInfoDetail',
+          component: ApiInfoDetail,
         },
         {
           path: '/home/addApiInfo',

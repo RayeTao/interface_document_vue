@@ -47,7 +47,7 @@
 
       methods:{
         init(){
-          this.getApiInfo()
+         // this.getApiInfo()
         },
         editMenuName(){
           let vm = this
@@ -65,10 +65,21 @@
           })
         },
         getApiInfo(){
-          this.$router.push({name: 'apiList'})
+          let vm = this;
+          this.$router.push({
+            name: 'apiList',
+            params: {
+              menuId: vm.menuItem.menuId
+            }
+          })
         },
         addApiInfo(){
-          this.$router.push({name: 'addApiInfo'})
+          this.$router.push({
+            name: 'addApiInfo',
+            params: {
+              menuId: this.menuItem.menuId
+            }
+          })
         }
       },
       mounted(){
